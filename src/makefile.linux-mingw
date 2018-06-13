@@ -1,0 +1,150 @@
+# Copyright (c) 2009-2010 Satoshi Nakamoto
+# Distributed under the MIT/X11 software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+DEPSDIR ?= /mnt/mxe/usr/$(TARGET_PLATFORM)-w64-mingw32.static
+HOST:=$(TARGET_PLATFORM)-w64-mingw32
+INCDIR:=$(DEPSDIR)/include
+LIBDIR:=$(DEPSDIR)/lib
+AR:=$(TARGET_PLATFORM)-w64-mingw32.static-ar
+CC:=$(TARGET_PLATFORM)-w64-mingw32.static-gcc
+CXX:=$(TARGET_PLATFORM)-w64-mingw32.static-g++
+RANLIB=$(TARGET_PLATFORM)-w64-mingw32.static-ranlib
+STRIP=$(TARGET_PLATFORM)-w64-mingw32.static-strip
+
+INCLUDEPATHS= \
+ -I"$(CURDIR)" \
+ -I"$(CURDIR)"/obj \
+ -I"$(INCDIR)/boost" \
+ -I"$(INCDIR)/openssl/include" \
+ -I"$(INCDIR)"
+
+LIBPATHS= \
+ -L"$(LIBDIR)"
+
+LIBS= \
+ -static-libgcc \
+ -static-libstdc++ \
+ -l boost_system-mt \
+ -l boost_filesystem-mt \
+ -l boost_program_options-mt \
+ -l boost_thread_win32-mt \
+ -l boost_chrono-mt \
+ -l db_cxx \
+ -l ssl \
+ -l crypto \
+ -l z \
+ -l pthread
+
+DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -DCURL_STATICLIB -DMINIUPNP_STATICLIB
+DEBUGFLAGS=-g
+xCXXFLAGS=-O2 -w -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS) $(CXXFLAGS)
+# enable: ASLR, DEP and large address aware
+# nubit: large address only on 32 bits
+ifeq ($(HOST),i686-w64-mingw32)
+xLDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware $(LDFLAGS)
+else
+xLDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat $(LDFLAGS)
+endif
+
+TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
+
+ifndef USE_UPNP
+	override USE_UPNP = -
+endif
+ifneq (${USE_UPNP}, -)
+	LIBPATHS += -L"$(DEPSDIR)/miniupnpc"
+	LIBS += -l miniupnpc -l iphlpapi
+	DEFS += -DSTATICLIB -DMINIUPNP_STATICLIB -DUSE_UPNP=$(USE_UPNP)
+endif
+
+ifndef USE_IPV6
+    USE_IPV6 = 1
+endif
+ifneq (${USE_IPV6}, -)
+	DEFS += -DUSE_IPV6=$(USE_IPV6)
+endif
+
+LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
+
+# TODO: make the mingw builds smarter about dependencies, like the linux/osx builds are
+HEADERS = $(wildcard *.h)
+
+OBJS= \
+    obj/alert.o \
+    obj/version.o \
+    obj/checkpoints.o \
+    obj/netbase.o \
+    obj/addrman.o \
+    obj/crypter.o \
+    obj/key.o \
+    obj/db.o \
+    obj/init.o \
+    obj/keystore.o \
+    obj/main.o \
+    obj/net.o \
+    obj/protocol.o \
+    obj/bitcoinrpc.o \
+    obj/rpcdump.o \
+    obj/rpcnet.o \
+    obj/rpcmining.o \
+    obj/rpcwallet.o \
+    obj/rpcblockchain.o \
+    obj/rpcrawtransaction.o \
+    obj/script.o \
+    obj/sync.o \
+    obj/util.o \
+    obj/wallet.o \
+    obj/walletdb.o \
+    obj/noui.o \
+    obj/kernel.o \
+    obj/pbkdf2.o \
+    obj/scrypt_mine.o \
+    obj/scrypt-x86.o \
+    obj/scrypt-x86_64.o
+
+all: Eidasd.exe
+
+LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
+DEFS += -I"$(CURDIR)/leveldb/include" -DUSE_LEVELDB
+DEFS += -I"$(CURDIR)/leveldb/helpers"
+OBJS += obj/txdb-leveldb.o
+leveldb/libleveldb.a:
+	@echo "Building LevelDB ..." && cd leveldb && CC=$(CC) CXX=$(CXX) TARGET_OS=OS_WINDOWS_CROSSCOMPILE OPT="$(xCXXFLAGS)" $(MAKE) libleveldb.a libmemenv.a && $(RANLIB) libleveldb.a && $(RANLIB) libmemenv.a && cd ..
+obj/txdb-leveldb.o: leveldb/libleveldb.a
+
+obj/build.h: FORCE
+	/bin/sh ../share/genbuild.sh obj/build.h
+version.cpp: obj/build.h
+DEFS += -DHAVE_BUILD_INFO
+
+obj/%.o: %.cpp $(HEADERS)
+	$(CXX) -c $(xCXXFLAGS) -o $@ $<
+
+Eidasd.exe: $(OBJS:obj/%=obj/%)
+	$(CXX) $(xCXXFLAGS) $(xLDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS) -lshlwapi
+	$(STRIP) Eidasd.exe
+
+TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
+
+obj-test/%.o: test/%.cpp $(HEADERS)
+	$(CXX) -c $(TESTDEFS) $(xCXXFLAGS) -o $@ $<
+
+test_Eidas.exe: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
+	$(CXX) $(xCXXFLAGS) $(xLDFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework-mt-s $(LIBS)
+
+obj/scrypt-x86.o: scrypt-x86.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+obj/scrypt-x86_64.o: scrypt-x86_64.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+clean:
+	-rm -f obj/*.o
+	-rm -f Eidasd.exe
+	-rm -f obj-test/*.o
+	-rm -f test_Eidas.exe
+	-rm -f obj/build.h
+	cd leveldb && TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) clean && cd ..
+
+FORCE:

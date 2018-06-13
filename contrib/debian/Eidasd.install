@@ -1,0 +1,2 @@
+debian/bin/Eidasd usr/bin
+src/Eidasd usr/lib/Eidas

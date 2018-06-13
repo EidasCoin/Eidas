@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Eidas
+Comment=Eidas P2P Cryptocurrency
+Comment[fr]=Eidas, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Eidas, eşten eşe kriptografik sanal para birimi
+Comment[es]=Eidas, una criptomoneda P2P
+Exec=/usr/bin/Eidas-qt
+Terminal=false
+Type=Application
+Icon=/usr/share/pixmaps/bitcoin80.xpm
+MimeType=x-scheme-handler/Eidas;
+Categories=Office;

@@ -1,0 +1,34 @@
+src/*.exe
+src/Eidas
+src/Eidasd
+src/test_Eidas
+.*.swp
+*.*~*
+*.bak
+*.rej
+*.orig
+*.o
+*.patch
+.Eidas
+
+# Compilation and Qt preprocessor part
+*.qm
+Makefile
+Eidas-qt
+Eidas-qt.app
+
+# Unit-tests
+Makefile.test
+Eidas-qt_test
+
+# Resources cpp
+qrc_*.cpp
+
+# Qt creator
+*.pro.user
+
+# Mac specific
+.DS_Store
+build
+
+!src/leveldb-*/Makefile

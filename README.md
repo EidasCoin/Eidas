@@ -18,3 +18,5 @@ saving your coins while securing the Eidas network.
 - MAX : 100 million total coins
 
 
+Why Eidas!
+http://www.eidascoin.com/why.html

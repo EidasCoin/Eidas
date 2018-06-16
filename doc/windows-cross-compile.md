@@ -59,20 +59,20 @@ Build OpenSSL for windows (version 1.1.x doesn't work)
     $ cd ..
  ```
     
-//Compiling berkley db:
-//Download and unpack berkeley db:
+Compiling berkley db:
+Download and unpack berkeley db:
 ```
     $ cd /mnt
     $ wget http://download.oracle.com/berkeley-db/db-6.2.32.tar.gz
     $ tar zxvf db-6.2.32.tar.gz
 ```
-//Make bash script for compilation:
+Make bash script for compilation:
 ```
     $ cd /mnt/db-6.2.32
     $ touch compile-db.sh
     $ chmod ugo+x compile-db.sh
 ```
-//Content of compile-db.sh:
+Content of compile-db.sh:
 ```
 ///////////////////////////////////////////////////////
 #!/bin/bash
@@ -96,23 +96,23 @@ CXX=$MXE_PATH/usr/bin/i686-w64-mingw32.static-g++ \
 
     $ make install
 ```
-//Compile:
+Compile:
     `$ ./compile-db.sh`
 
-//Compiling miniupnpc:
-//Download and unpack miniupnpc:
+Compiling miniupnpc:
+Download and unpack miniupnpc:
 ```
     $ cd /mnt
     $ wget http://miniupnp.free.fr/files/miniupnpc-1.9.tar.gz
     $ tar zxvf miniupnpc-1.9.tar.gz
 ```
-//Make bash script for compilation:
+Make bash script for compilation:
 ```
     $ cd /mnt/miniupnpc-1.9
     $ touch compile-m.sh
     $ chmod ugo+x compile-m.sh
 ```
-//Content of compile-m.sh:
+Content of compile-m.sh:
 ```
 ///////////////////////////////////////////////////////////////////////////
 #!/bin/bash
@@ -127,47 +127,45 @@ cp *.h $MXE_PATH/usr/i686-w64-mingw32.static/include/miniupnpc
 cp libminiupnpc.a $MXE_PATH/usr/i686-w64-mingw32.static/lib
 ////////////////////////////////////////////////////////////////////////////
 ```
-//Compile:
+Compile:
 ```
     $ ./compile-m.sh
     $ cd ..
 ```
 
-
-///Build qrencode QR
-// Clone mSIGNA repository, in case you haven't done so already:
+Build qrencode QR
+Clone mSIGNA repository, in case you haven't done so already:
 ```
     $ cd mnt
     $ git clone https://github.com/ciphrex/mSIGNA.git
 ```
-//Build qrencode QR Code C library (libqrencode) for windows
+Build qrencode QR Code C library (libqrencode) for windows
 ```
     $ cd mSIGNA/deps/qrencode-3.4.3
     $ ./configure --host=x86_64-w64-mingw32 --prefix=/usr/local/x86_64-w64-mingw32 --without-tools --enable-static --disable-shared
     $ make
     $ sudo make install
     $ cd ../../..
-	
-    ```
+```
     
-## Build Windows executables
+# Build Windows executables
 
-//Add the path to MXE plus `usr/bin` to your `PATH`:
+Add the path to MXE plus `usr/bin` to your `PATH`:
 ```
     `$ export PATH=/mnt/mxe/usr/bin:$PATH`
-
-//To make a 32-bit Windows executable, clone the Eidas repository to /mnt/  folder 
+```
+To make a 32-bit Windows executable, clone the Eidas repository to /mnt/  folder 
  ```
     $ cd /mnt
     $ git clone https://github.com/Eidascoin/Eidas.git
 ```
-// Make bash script for compilation:
+Make bash script for compilation:
 ```
     $ cd /mnt/Eidas
     $ touch compile-EDS.sh
     $ chmod ugo+x compile-EDS.sh
 ```
-// Content of compile-EDS.sh:
+Content of compile-EDS.sh:
    ```  $ nano compile-EDS.sh```
    ```
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,10 +187,10 @@ i686-w64-mingw32.static-qmake-qt5 \
 make -f Makefile.Release
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ```
-// compile Eidas
+compile Eidas
      ``` $ ./compile-EDS.sh```
       
-//For a 64-bit build: replace : mxe-i686-w64-mingw32.static with mxe-x86-64-w64-mingw32.static for all steps
+For a 64-bit build: replace : mxe-i686-w64-mingw32.static with mxe-x86-64-w64-mingw32.static for all steps
 
 
 output :``` $ ./compile-EDS.sh ``` will create a file called `release/Eidas-qt.exe`, which should be usable on a 32-bit or 64-bit Windows system, respectively.

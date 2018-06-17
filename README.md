@@ -12,7 +12,7 @@ saving your coins while securing the Eidas network.
 - PoS variable interests:
       - 1st year: 20%
       - 2nd and subsequent years: 5%
-- 4 confirmations for transaction, thus fast 2 mins confirmation for transactions
+- 4 confirmations for transaction.
 - 40 confirmations for minted blocks
 - Ports: 29186 (connection) and 29086 (RPC)
 - MAX : 100 million total coins

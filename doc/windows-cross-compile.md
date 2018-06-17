@@ -13,18 +13,20 @@ Have a Debian or Debian-derived system, like Ubuntu or Mint Linux.
 
 http://mxe.cc/#requirements-debian
 
-    ``` $ cd mnt```
+     $ cd mnt
     
 install cross compile environment
 Install mxe dependencies:
-  ```$ sudo apt-get install p7zip-full autoconf automake autopoint bash bison bzip2 cmake flex gettext git g++ gperf intltool libffi-dev libtool libltdl-dev libssl-dev libxml-parser-perl make openssl patch perl pkg-config python ruby scons sed unzip wget xz-utils```
-  ```$ sudo apt-get install libtool-bin```
-  ```$ sudo apt-get install libgtk2.0-dev```
-For 64-bit Ubuntu also install:
-  ``` $ apt-get install g++-multilib libc6-dev-i386```
+  ```$  apt-get install p7zip-full autoconf automake autopoint bash bison bzip2 cmake flex gettext git g++ gperf intltool libffi-dev libtool libltdl-dev libssl-dev libxml-parser-perl make openssl patch perl pkg-config python ruby scons sed unzip wget xz-utils```
+  ```$  apt-get install libtool-bin```
+  ```$  apt-get install libgtk2.0-dev```
+  
+  For 64-bit Ubuntu also install:
+  
+  ``` $  apt-get install g++-multilib libc6-dev-i386```
   
 Clone mxe github repo
-  ``` $ git clone https://github.com/mxe/mxe.git```
+  ``` $  git clone https://github.com/mxe/mxe.git```
 
 Build MXE
 Add `MXE_TARGETS` so that we get 32-bit Windows binaries.
@@ -54,9 +56,9 @@ Build OpenSSL for windows (version 1.1.x doesn't work)
     $ tar -xzvf openssl-1.0.2d.tar.gz
     $ cp -R openssl-1.0.2d openssl-win32-build
     $ cd openssl-win32-build
-    $ CROSS_COMPILE="i686-w64-mingw32-" ./Configure mingw no-asm no-shared --prefix=/mnt/mxe/usr/i686-w64-mingw32.static
+    $ CROSS_COMPILE="i686-w64-mingw32.static-" ./Configure mingw no-asm no-shared --prefix=/mnt/mxe/usr/i686-w64-mingw32.static
     $ make
-    $ sudo make install
+    $  make install
     $ cd ..
  ```
     
@@ -74,6 +76,7 @@ Make bash script for compilation:
     $ chmod ugo+x compile-db.sh
 ```
 Content of compile-db.sh:
+   ` $ nano compile-db.sh `
 ```
 ///////////////////////////////////////////////////////
 #!/bin/bash
@@ -90,13 +93,11 @@ CXX=$MXE_PATH/usr/bin/i686-w64-mingw32.static-g++ \
 	--enable-cxx \
 	--host x86 \
 	--prefix=$MXE_PATH/usr/i686-w64-mingw32.static
+make
+make install
 ///////////////////////////////////////////////////////
 ```
-```
-    $ make
 
-    $ make install
-```
 Compile:
     `$ ./compile-db.sh`
 
@@ -143,9 +144,9 @@ Clone mSIGNA repository, in case you haven't done so already:
 Build qrencode QR Code C library (libqrencode) for windows
 ```
     $ cd mSIGNA/deps/qrencode-3.4.3
-    $ ./configure --host=x86_64-w64-mingw32 --prefix=/usr/local/x86_64-w64-mingw32 --without-tools --enable-static --disable-shared
+    $ ./configure --host=i686-w64-mingw32.static --prefix=/mnt/mxe/usr/i686-w64-mingw32.static --without-tools --enable-static --disable-shared
     $ make
-    $ sudo make install
+    $  make install
     $ cd ../../..
 ```
     
@@ -153,7 +154,7 @@ Build qrencode QR Code C library (libqrencode) for windows
 
 Add the path to MXE plus `usr/bin` to your `PATH`:
 ```
-    `$ export PATH=/mnt/mxe/usr/bin:$PATH`
+    $ export PATH=/mnt/mxe/usr/bin:$PATH
 ```
 To make a 32-bit Windows executable, clone the Eidas repository to /mnt/  folder 
  ```
@@ -184,10 +185,17 @@ i686-w64-mingw32.static-qmake-qt5 \
 	BDB_LIB_PATH=$MXE_LIB_PATH \
 	MINIUPNPC_INCLUDE_PATH=$MXE_INCLUDE_PATH \
 	MINIUPNPC_LIB_PATH=$MXE_LIB_PATH \
+	QRENCODE_INCLUDE_PATH=$MXE_INCLUDE_PATH \
+        QRENCODE_LIB_PATH=$MXE_LIB_PATH \
 	QMAKE_LRELEASE=/mnt/mxe/usr/i686-w64-mingw32.static/qt5/bin/lrelease Eidas-qt.pro
 make -f Makefile.Release
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ```
+
+to avoid /build_detect_platform: Permission denied error , do :
+`chmod 755 src/leveldb/build_detect_platform`
+
+
 compile Eidas
      ``` $ ./compile-EDS.sh```
       

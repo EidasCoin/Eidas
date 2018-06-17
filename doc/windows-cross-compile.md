@@ -41,6 +41,7 @@ Build boost for windows
     $ cd boost_1_63_0
     $ ./bootstrap.sh --without-icu
     $ echo "using gcc : mxe : i686-w64-mingw32.static-g++ : <rc>i686-w64-mingw32.static-windres <archiver>i686-w64-mingw32.static-ar <ranlib>i686-w64-mingw32.static-ranlib ;" > user-config.jam
+    $ export PATH=/mnt/mxe/usr/bin:$PATH  // to avoid this error i686-w64-mingw32.static-g++' not found
     $ ./b2 toolset=gcc address-model=32 target-os=windows variant=release threading=multi threadapi=win32 \
         link=static runtime-link=static --prefix=/mnt/mxe/usr/i686-w64-mingw32.static --user-config=user-config.jam \
         --without-mpi --without-python -sNO_BZIP2=1 --layout=tagged install
